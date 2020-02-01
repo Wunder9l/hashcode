@@ -2,6 +2,7 @@
 
 #include "util.h"
 #include <iostream>
+#include <cassert>
 
 enum class EAction {
     Load,
@@ -45,7 +46,7 @@ struct Command {
     }
 };
 
-struct World {
+struct TWorld {
     int height, width;
     int dronesCount;
     int maxTime;
@@ -56,13 +57,13 @@ struct World {
     int ordersCount;
 };
 
-struct Product {
+struct TProduct {
     int id;
     int weight;
     int needed = 0;
 };
 
-struct Order {
+struct TOrder {
     int id;
     pair<int, int> loc;
     unordered_map<int, int> orderedProducts;
@@ -90,7 +91,7 @@ struct Order {
 };
 
 
-struct Warehouse {
+struct TWarehouse {
     int id;
     pair<int, int> loc;
     vector<int> productsCount;
@@ -98,7 +99,7 @@ struct Warehouse {
 
 };
 
-struct Drone {
+struct TDrone {
     int id;
     pair<int, int> loc;
     int timestamp = 0;
@@ -106,12 +107,12 @@ struct Drone {
 
     int curWeight = 0; // debug field
 
-    Drone(const Warehouse& w) {
+    TDrone(const TWarehouse& w) {
         product = productCnt = 0;
         this->loc = w.loc;
     }
 
-    int timeToDone(const Warehouse& w, const Order& o) const {
+    int timeToDone(const TWarehouse& w, const TOrder& o) const {
         return timestamp + distance(loc, w.loc) + o.wDistance[w.id];
     }
 

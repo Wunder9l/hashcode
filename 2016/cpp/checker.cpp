@@ -3,8 +3,8 @@
 #include <utility>
 
 
-Checker::Checker(const struct World& world, const vector<Product>& products, vector<Warehouse>  warehouses,
-                 vector<Order>  orders, vector<Drone>  drones)
+Checker::Checker(const struct TWorld& world, const vector<TProduct>& products, vector<TWarehouse>  warehouses,
+                 vector<TOrder>  orders, vector<TDrone>  drones)
      : World(world)
      , Products(products)
      , Warehouses(std::move(warehouses))

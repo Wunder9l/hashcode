@@ -1,21 +1,18 @@
-#pragma once
-
 #include "models.h"
 #include "checker.h"
 #include "simulator.h"
 #include "annealing_simulator.h"
 #include <fstream>
-#include <sstream>
 #include <iostream>
-#include <assert.h>
+#include <cstring>
 
 using namespace std;
 
-World world;
-vector<Product> products;
-vector<Order> orders;
-vector<Warehouse> warehouses;
-vector<Drone> drones;
+TWorld world;
+vector<TProduct> products;
+vector<TOrder> orders;
+vector<TWarehouse> warehouses;
+vector<TDrone> drones;
 ConstantKeeper<int> intConsts;
 
 
@@ -59,7 +56,7 @@ void readInput(istream& input) {
         }
     }
 
-    drones = vector<Drone>(world.dronesCount, Drone(warehouses[0]));
+    drones = vector<TDrone>(world.dronesCount, TDrone(warehouses[0]));
     for (int i = 0; i < drones.size(); ++i) {
         drones[i].id = i;
     }
@@ -110,7 +107,7 @@ vector<Command> readCommands(const char* filename) {
 }
 
 void DoAnnealing(string debugFilename) {
-    Simulator simulator(world, products, warehouses, orders, drones, intConsts);
+    TSimulator simulator(world, products, warehouses, orders, drones, intConsts);
     Checker checker(world, products, warehouses, orders, drones);
     double startTemp = 64.0;
     ui64 maxIterations = 100000;
@@ -139,7 +136,7 @@ int main(int argc, char* argv[]) {
 
     vector<Command> commands;
     if (!strcmp(argv[1], "solve")) {
-        Simulator simulator(world, products, warehouses, orders, drones, intConsts);
+        TSimulator simulator(world, products, warehouses, orders, drones, intConsts);
         simulator.SortOrders();
         commands = simulator.Solve();
         writeToFile(argv[3], commands);

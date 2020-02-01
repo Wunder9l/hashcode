@@ -3,27 +3,27 @@
 #include "models.h"
 #define ORDER_CMP "OrderCmp"
 
-class Simulator {
+class TSimulator {
 public:
-    Simulator(const World& world, vector <Product>  products, vector <Warehouse>  warehouses,
-              vector <Order>  orders, vector <Drone>  drones, ConstantKeeper<int> intConst);
+    TSimulator(const TWorld& world, vector <TProduct>  products, vector <TWarehouse>  warehouses,
+               vector <TOrder>  orders, vector <TDrone>  drones, ConstantKeeper<int> intConst);
     vector<Command> Solve();
     void SortOrders();
-    void SetOrders(vector<Order> orders);
-    const vector<Order>& GetOrders();
+    void SetOrders(vector<TOrder> orders);
+    const vector<TOrder>& GetOrders();
 
 private:
-    bool OrderCmp(const Order& a, const Order& b);
-    void MakeCommands(const vector<Command>& commands, Order& order);
-    void TryCompleteOrder(Order& order);
-    pair<int, vector<Command>> GetBestGoods(const Warehouse& warehouse, const Order& order);
+    bool OrderCmp(const TOrder& a, const TOrder& b);
+    void MakeCommands(const vector<Command>& commands, TOrder& order);
+    void TryCompleteOrder(TOrder& order);
+    pair<int, vector<Command>> GetBestGoods(const TWarehouse& warehouse, const TOrder& order);
 
-    const World World;
+    const TWorld World;
     ConstantKeeper<int> IntConsts;
-    vector <Product> Products;
-    vector <Warehouse> Warehouses;
-    vector <Order> Orders;
-    vector <Drone> Drones;
+    vector <TProduct> Products;
+    vector <TWarehouse> Warehouses;
+    vector <TOrder> Orders;
+    vector <TDrone> Drones;
     vector <Command> Commands;
 };
 

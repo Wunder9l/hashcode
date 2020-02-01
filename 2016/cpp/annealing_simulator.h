@@ -11,15 +11,15 @@
 
 class DeliverySimulatorState {
 public:
-    std::vector<Order> Orders;
+    std::vector<TOrder> Orders;
 };
 
 class DeliverySimulator: public IAnnealingSimulator<DeliverySimulatorState> {
     double StartTemperature;
-    Simulator EnvSimulator;
+    TSimulator EnvSimulator;
     Checker SolutionChecker;
 public:
-    DeliverySimulator(double startTemperature, Simulator simulator, Checker checker)
+    DeliverySimulator(double startTemperature, TSimulator simulator, Checker checker)
         : StartTemperature(startTemperature)
         , EnvSimulator(std::move(simulator))
         , SolutionChecker(std::move(checker))

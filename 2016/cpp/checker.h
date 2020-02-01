@@ -5,8 +5,8 @@
 
 class Checker {
 public :
-    Checker(const World& world, const vector<Product>& products, vector<Warehouse>  warehouses,
-            vector<Order>  orders, vector<Drone>  drones);
+    Checker(const TWorld& world, const vector<TProduct>& products, vector<TWarehouse>  warehouses,
+            vector<TOrder>  orders, vector<TDrone>  drones);
 
     int CheckSolution(const vector<Command>& commands);
 
@@ -15,11 +15,11 @@ private:
 
     int PerformDeliverCommand(const Command& c);
 
-    const World& World;
-    const vector<Product>& Products;
-    vector<Warehouse> Warehouses;
-    vector<Order> Orders;
-    vector<Drone> Drones;
+    const TWorld& World;
+    const vector<TProduct>& Products;
+    vector<TWarehouse> Warehouses;
+    vector<TOrder> Orders;
+    vector<TDrone> Drones;
 };
 
 

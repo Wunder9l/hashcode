@@ -3,8 +3,8 @@
 #include <utility>
 #include <functional>
 
-Simulator::Simulator(const struct World& world, vector <Product>  products, vector <Warehouse>  warehouses,
-                     vector <Order>  orders, vector <Drone>  drones, ConstantKeeper<int> intConst)
+TSimulator::TSimulator(const struct TWorld& world, vector <TProduct>  products, vector <TWarehouse>  warehouses,
+                       vector <TOrder>  orders, vector <TDrone>  drones, ConstantKeeper<int> intConst)
     : World(world)
     , Products(std::move(products))
     , Warehouses(std::move(warehouses))
@@ -14,7 +14,7 @@ Simulator::Simulator(const struct World& world, vector <Product>  products, vect
 {
 }
 
-pair<int, vector<Command>> Simulator::GetBestGoods(const Warehouse& warehouse, const Order& order) {
+pair<int, vector<Command>> TSimulator::GetBestGoods(const TWarehouse& warehouse, const TOrder& order) {
     int weight = 0;
     int pWeight;
     vector<Command> commands;
@@ -41,7 +41,7 @@ pair<int, vector<Command>> Simulator::GetBestGoods(const Warehouse& warehouse, c
     return make_pair(weight, commands);
 }
 
-void Simulator::MakeCommands(const vector<Command>& commands, Order& order) {
+void TSimulator::MakeCommands(const vector<Command>& commands, TOrder& order) {
     pair<int, int> destination;
     for (const auto& c: commands) {
         if (c.action == EAction::Load) {
@@ -63,7 +63,7 @@ void Simulator::MakeCommands(const vector<Command>& commands, Order& order) {
     }
 }
 
-void Simulator::TryCompleteOrder(Order& order) {
+void TSimulator::TryCompleteOrder(TOrder& order) {
     while (!order.isCompleted()) {
         int bestRes = 0;
         vector<Command> bestCommands;
@@ -93,7 +93,7 @@ void Simulator::TryCompleteOrder(Order& order) {
     order.complete();
 }
 
-vector<Command> Simulator::Solve() {
+vector<Command> TSimulator::Solve() {
     Commands.clear();
     for (auto& o : Orders) {
         TryCompleteOrder(o);
@@ -101,7 +101,7 @@ vector<Command> Simulator::Solve() {
     return Commands;
 }
 
-bool Simulator::OrderCmp(const Order& a, const Order& b) {
+bool TSimulator::OrderCmp(const TOrder& a, const TOrder& b) {
     static const string key = ORDER_CMP;
 
     switch (IntConsts.get(key)) {
@@ -111,14 +111,14 @@ bool Simulator::OrderCmp(const Order& a, const Order& b) {
     assert(("OrderCmp algorithm should be defined", false));
 }
 
-void Simulator::SortOrders() {
-    sort(Orders.begin(), Orders.end(), [this](const Order& a, const Order& b) { return this->OrderCmp(a, b); });
+void TSimulator::SortOrders() {
+    sort(Orders.begin(), Orders.end(), [this](const TOrder& a, const TOrder& b) { return this->OrderCmp(a, b); });
 }
 
-void Simulator::SetOrders(vector<Order> orders) {
+void TSimulator::SetOrders(vector<TOrder> orders) {
     Orders = std::move(orders);
 }
 
-const vector<Order>& Simulator::GetOrders() {
+const vector<TOrder>& TSimulator::GetOrders() {
     return Orders;
 }
