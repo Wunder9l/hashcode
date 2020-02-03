@@ -13,7 +13,7 @@ vector<TProduct> products;
 vector<TOrder> orders;
 vector<TWarehouse> warehouses;
 vector<TDrone> drones;
-ConstantKeeper<int> intConsts;
+TConstantStorage constants;
 
 
 void readInput(istream& input) {
@@ -63,7 +63,7 @@ void readInput(istream& input) {
 }
 
 
-void readFromFile(const char* filename) {
+void readFromFile(const char *filename) {
     filebuf fb;
     if (fb.open(filename, std::ifstream::in)) {
         istream input(&fb);
@@ -74,7 +74,7 @@ void readFromFile(const char* filename) {
     }
 }
 
-void writeToFile(const char* filename, vector<Command> commands) {
+void writeToFile(const char *filename, vector<Command> commands) {
     filebuf fb;
     if (fb.open(filename, std::ifstream::out)) {
         ostream out(&fb);
@@ -88,7 +88,7 @@ void writeToFile(const char* filename, vector<Command> commands) {
     }
 }
 
-vector<Command> readCommands(const char* filename) {
+vector<Command> readCommands(const char *filename) {
     filebuf fb;
     vector<Command> commands;
     if (fb.open(filename, std::ifstream::in)) {
@@ -107,16 +107,16 @@ vector<Command> readCommands(const char* filename) {
 }
 
 void DoAnnealing(string debugFilename) {
-    TSimulator simulator(world, products, warehouses, orders, drones, intConsts);
+    TSimulator simulator(world, products, warehouses, orders, drones, constants);
     Checker checker(world, products, warehouses, orders, drones);
     double startTemp = 64.0;
-    ui64 maxIterations = 100000;
     DeliverySimulator deliverySimulator(startTemp, simulator, checker);
 
 //    simulator.SortOrders();
     DeliverySimulatorState startState{.Orders = simulator.GetOrders()};
 
     auto annealing = Annealing<DeliverySimulatorState>(deliverySimulator);
+    const ui64 maxIterations = constants.GetInt("iterations");
     DebugClass debug(maxIterations);
     std::function<void(uint64_t, const DeliverySimulatorState&, double, double)> callback =
             [&debug](uint64_t i, const DeliverySimulatorState& state, double energy, double temperature) {
@@ -130,19 +130,22 @@ void DoAnnealing(string debugFilename) {
     debug.WriteToFile(debugFilename);
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     readFromFile(argv[2]);  // save to global structures
-    intConsts.registerConst(ORDER_CMP, 1);  // atoi(argv[4]))
+    constants.RegisterInt(ORDER_CMP, 1);  // atoi(argv[4]))
 
     vector<Command> commands;
     if (!strcmp(argv[1], "solve")) {
-        TSimulator simulator(world, products, warehouses, orders, drones, intConsts);
+        TSimulator simulator(world, products, warehouses, orders, drones, constants);
         simulator.SortOrders();
         commands = simulator.Solve();
         writeToFile(argv[3], commands);
     } else if (!strcmp(argv[1], "eval")) {
         commands = readCommands(argv[3]);
     } else if (!strcmp(argv[1], "annealing")) {
+        assert(("Too few arguments, {exe-file} annealing {input filename} {output filename} "
+                "[constants {intConst name=value doubleConst name=value}]", argc >= 4));
+        constants.ParseConstants(argv + 4, argc - 4);
         DoAnnealing(argv[3]);
     }
     Checker checker(world, products, warehouses, orders, drones);

@@ -4,13 +4,13 @@
 #include <functional>
 
 TSimulator::TSimulator(const struct TWorld& world, vector <TProduct>  products, vector <TWarehouse>  warehouses,
-                       vector <TOrder>  orders, vector <TDrone>  drones, ConstantKeeper<int> intConst)
+                       vector <TOrder>  orders, vector <TDrone>  drones, TConstantStorage consts)
     : World(world)
     , Products(std::move(products))
     , Warehouses(std::move(warehouses))
     , Orders(std::move(orders))
     , Drones(std::move(drones))
-    , IntConsts(std::move(intConst))
+    , Constants(std::move(consts))
 {
 }
 
@@ -104,7 +104,7 @@ vector<Command> TSimulator::Solve() {
 bool TSimulator::OrderCmp(const TOrder& a, const TOrder& b) {
     static const string key = ORDER_CMP;
 
-    switch (IntConsts.get(key)) {
+    switch (Constants.GetInt(key)) {
         case 1:
             return a.totalWeight < b.totalWeight;
     }

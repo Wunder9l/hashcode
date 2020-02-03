@@ -6,7 +6,7 @@
 class TSimulator {
 public:
     TSimulator(const TWorld& world, vector <TProduct>  products, vector <TWarehouse>  warehouses,
-               vector <TOrder>  orders, vector <TDrone>  drones, ConstantKeeper<int> intConst);
+               vector <TOrder>  orders, vector <TDrone>  drones, TConstantStorage consts);
     vector<Command> Solve();
     void SortOrders();
     void SetOrders(vector<TOrder> orders);
@@ -19,12 +19,13 @@ private:
     pair<int, vector<Command>> GetBestGoods(const TWarehouse& warehouse, const TOrder& order);
 
     const TWorld World;
-    ConstantKeeper<int> IntConsts;
     vector <TProduct> Products;
     vector <TWarehouse> Warehouses;
     vector <TOrder> Orders;
     vector <TDrone> Drones;
     vector <Command> Commands;
+public:
+    const TConstantStorage Constants;
 };
 
 

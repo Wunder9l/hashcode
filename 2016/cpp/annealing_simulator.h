@@ -14,16 +14,14 @@ public:
     std::vector<TOrder> Orders;
 };
 
-class DeliverySimulator: public IAnnealingSimulator<DeliverySimulatorState> {
+class DeliverySimulator : public IAnnealingSimulator<DeliverySimulatorState> {
     double StartTemperature;
     TSimulator EnvSimulator;
     Checker SolutionChecker;
 public:
     DeliverySimulator(double startTemperature, TSimulator simulator, Checker checker)
-        : StartTemperature(startTemperature)
-        , EnvSimulator(std::move(simulator))
-        , SolutionChecker(std::move(checker))
-    {
+            : StartTemperature(startTemperature), EnvSimulator(std::move(simulator)),
+              SolutionChecker(std::move(checker)) {
         EnvSimulator.SortOrders();
     }
 
@@ -36,8 +34,11 @@ public:
 
     double EnergyCallback(const DeliverySimulatorState& state) override {
         const static double MULTIPLIER = 100000.0;
-        return MULTIPLIER / (double) GetPoints(state);
-//        return -GetPoints(state);
+        int val = EnvSimulator.Constants.GetInt("energy");
+        if (val == 1) {
+            return MULTIPLIER / (double) GetPoints(state);
+        }
+        return -GetPoints(state);
     }
 
     DeliverySimulatorState NextStateCallback(const DeliverySimulatorState& state) override {
