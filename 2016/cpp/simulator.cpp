@@ -124,7 +124,6 @@ void TSimulator::SetOrders(const vector<int>& ordersIds) {
     unordered_map<int, size_t> positions;
     for (size_t i = 0; i < Orders.size(); ++i){
         positions[Orders[i].id] = i;
-        cout << "positions[" << i << "] = " << i << ", size=" << positions.size() << endl;
     }
     vector<TOrder> newOrders(Orders.size());
     for (size_t i = 0; i < ordersIds.size(); ++i){
