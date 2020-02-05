@@ -15,6 +15,9 @@ vector<TWarehouse> warehouses;
 vector<TDrone> drones;
 TConstantStorage constants;
 
+#define INT_CONST_ITERATIONS "iterations"
+#define INT_CONST_START_T "startT"
+#define INT_CONST_END_T "endT"
 
 void readInput(istream& input) {
     input >> world.height >> world.width >> world.dronesCount >> world.maxTime >> world.maxWeight;
@@ -106,23 +109,52 @@ vector<Command> readCommands(const char *filename) {
     return commands;
 }
 
-void DoAnnealing(string debugFilename) {
+vector<int> ReadOrders(const string& filename) {
+    filebuf fb;
+    vector<int> orderIds;
+    if (fb.open(filename, std::ifstream::in)) {
+        istream input(&fb);
+        orderIds.resize(orders.size());
+        ui64 iteration;
+        double energy, temp;
+        input >> iteration >> energy >> temp;
+        for (int i = 0; i < orders.size(); ++i) {
+            input >> orderIds[i];
+        }
+        fb.close();
+    } else {
+        assert(("Can not open file with dumpState", false));
+    }
+    return orderIds;
+}
+
+void DoAnnealing(const string& debugFilename, const string& dumpFilename) {
     TSimulator simulator(world, products, warehouses, orders, drones, constants);
     Checker checker(world, products, warehouses, orders, drones);
-    double startTemp = 64.0;
+    const double startTemp = constants.GetDouble(INT_CONST_START_T);
+    const double endTemp = constants.GetDouble(INT_CONST_END_T);
     DeliverySimulator deliverySimulator(startTemp, simulator, checker);
 
+    if (!dumpFilename.empty() && dumpFilename != "-") {
+        simulator.SetOrders(ReadOrders(dumpFilename));
+    }
 //    simulator.SortOrders();
     DeliverySimulatorState startState{.Orders = simulator.GetOrders()};
 
     auto annealing = Annealing<DeliverySimulatorState>(deliverySimulator);
-    const ui64 maxIterations = constants.GetInt("iterations");
+    const ui64 maxIterations = constants.GetInt(INT_CONST_ITERATIONS);
     DebugClass debug(maxIterations);
     std::function<void(uint64_t, const DeliverySimulatorState&, double, double)> callback =
             [&debug](uint64_t i, const DeliverySimulatorState& state, double energy, double temperature) {
                 debug.AddLogEntry(i, state, energy, temperature);
             };
-    const auto&[state, res] = annealing.Run(startTemp, 0.0001, startState, maxIterations, &callback);
+    cout << "Start of annealing simulation: T_start=" << startTemp << ", T_end=" << endTemp << ", maxIterations=" << maxIterations << endl;
+    cout << "Start state (energy=" << deliverySimulator.EnergyCallback(startState) << "):" << endl;
+    for (auto& o: startState.Orders) {
+        cout << ' ' << o.id;
+    }
+    cout << std::endl;
+    const auto&[state, res] = annealing.Run(startTemp, endTemp, startState, maxIterations, &callback);
     cout << "Result of annealing simulation: " << deliverySimulator.GetPoints(state) << ", energy=" << res << endl;
     for (const auto& o : state.Orders) {
         cout << ' ' << o.id;
@@ -145,8 +177,8 @@ int main(int argc, char *argv[]) {
     } else if (!strcmp(argv[1], "annealing")) {
         assert(("Too few arguments, {exe-file} annealing {input filename} {output filename} "
                 "[constants {intConst name=value doubleConst name=value}]", argc >= 4));
-        constants.ParseConstants(argv + 4, argc - 4);
-        DoAnnealing(argv[3]);
+        constants.ParseConstants(argv + 5, argc - 5);
+        DoAnnealing(argv[3], argv[4]);
     }
     Checker checker(world, products, warehouses, orders, drones);
     int res = checker.CheckSolution(commands);

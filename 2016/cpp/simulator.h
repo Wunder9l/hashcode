@@ -10,6 +10,7 @@ public:
     vector<Command> Solve();
     void SortOrders();
     void SetOrders(vector<TOrder> orders);
+    void SetOrders(const vector<int>& ordersIds);
     const vector<TOrder>& GetOrders();
 
 private:
